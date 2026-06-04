@@ -22,6 +22,11 @@ import ProgressCircle from '../../components/ProgressCircle';
 export default function AdminConsole() {
   const { logout } = useAuth();
   const router = useRouter();
+
+  const handleLogout = async () => {
+    await logout();
+    router.replace('/(auth)/splash' as any);
+  };
   
   const [metrics, setMetrics] = useState<any>(null);
   const [counts, setCounts] = useState({ vendors: 0, products: 0, influencers: 0 });
@@ -146,7 +151,7 @@ export default function AdminConsole() {
         </GlassCard>
 
         {/* Logout button */}
-        <TouchableOpacity onPress={logout} style={styles.logoutButton}>
+        <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
           <LogOut size={14} color="#ef4444" style={styles.logoutIcon} />
           <Text style={styles.logoutText}>Sign Out of Administrator</Text>
         </TouchableOpacity>

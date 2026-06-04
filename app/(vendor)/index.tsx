@@ -21,6 +21,11 @@ import ProgressCircle from '../../components/ProgressCircle';
 export default function VendorDashboard() {
   const { logout } = useAuth();
   const router = useRouter();
+
+  const handleLogout = async () => {
+    await logout();
+    router.replace('/(auth)/splash' as any);
+  };
   
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -149,7 +154,7 @@ export default function VendorDashboard() {
         )}
 
         {/* Logout button */}
-        <TouchableOpacity onPress={logout} style={styles.logoutButton}>
+        <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
           <LogOut size={14} color="#ef4444" style={styles.logoutIcon} />
           <Text style={styles.logoutText}>Sign Out of Vendor Portal</Text>
         </TouchableOpacity>

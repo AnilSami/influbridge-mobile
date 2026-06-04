@@ -21,6 +21,11 @@ export default function InfluencerDashboard() {
   const { logout } = useAuth();
   const router = useRouter();
 
+  const handleLogout = async () => {
+    await logout();
+    router.replace('/(auth)/splash' as any);
+  };
+
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -152,7 +157,7 @@ export default function InfluencerDashboard() {
       )}
 
       {/* Logout button */}
-      <TouchableOpacity onPress={logout} style={styles.logoutButton}>
+      <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
         <LogOut size={14} color="#ef4444" style={styles.logoutIcon} />
         <Text style={styles.logoutText}>Sign Out of Influencer Portal</Text>
       </TouchableOpacity>
