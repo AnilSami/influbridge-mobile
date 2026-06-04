@@ -19,8 +19,11 @@ import ProgressCircle from '../../components/ProgressCircle';
 import MeshBackground from '../../components/MeshBackground';
 
 export default function InfluencerDashboard() {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const router = useRouter();
+
+  const currentInfluencer = MockAPI.getInfluencers().find(i => i.userId === user?.id) || MockAPI.getInfluencers()[0];
+  const displayName = currentInfluencer?.displayName || 'Audrey Fitness';
 
   const handleLogout = async () => {
     await logout();
@@ -77,9 +80,9 @@ export default function InfluencerDashboard() {
       <View style={styles.header}>
         <View>
           <Text style={Typography.h2}>Earnings Console</Text>
-          <Text style={Typography.caption}>Audrey Fitness Profile</Text>
+          <Text style={Typography.caption}>{displayName} Profile</Text>
         </View>
-        <Avatar name="Audrey Fitness" ringColor="#10b981" />
+        <Avatar name={displayName} ringColor="#10b981" />
       </View>
 
       {/* Metrics Row */}

@@ -313,8 +313,17 @@ export const MockAPI = {
     return currentUser;
   },
   login: (email: string, role: 'VENDOR' | 'INFLUENCER' | 'ADMIN') => {
+    let resolvedId = `usr-${Math.random().toString(36).substr(2, 9)}`;
+    if (role === 'VENDOR') {
+      const match = vendors.find(v => v.user.email === email);
+      if (match) resolvedId = match.userId;
+    } else if (role === 'INFLUENCER') {
+      const match = influencers.find(i => i.user.email === email);
+      if (match) resolvedId = match.userId;
+    }
+
     currentUser = {
-      id: `usr-${Math.random().toString(36).substr(2, 9)}`,
+      id: resolvedId,
       email,
       role,
       isVerified: true

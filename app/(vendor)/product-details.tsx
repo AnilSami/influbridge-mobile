@@ -455,43 +455,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#ffffff',
   },
-  formScroll: {
-    maxHeight: 400,
-    marginBottom: 20,
-  },
-  formLabel: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: Colors.textLight,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 6,
-    marginTop: 12,
-  },
-  formInput: {
-    backgroundColor: 'rgba(2, 6, 23, 0.6)',
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    color: '#ffffff',
-    fontSize: 13,
-    height: 48,
-    marginBottom: 12,
-  },
-  formTextarea: {
-    height: 80,
-    paddingVertical: 10,
-    textAlignVertical: 'top',
-  },
-  formRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 12,
-  },
-  formRowCol: {
-    flex: 1,
-  },
+
   formErrorBanner: {
     backgroundColor: 'rgba(239, 68, 68, 0.1)',
     borderWidth: 1,

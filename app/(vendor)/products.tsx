@@ -419,40 +419,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  formScroll: {
-    marginBottom: 16,
-  },
-  formLabel: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: Colors.textLight,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 6,
-  },
-  formInput: {
-    backgroundColor: 'rgba(2, 6, 23, 0.6)',
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    height: 44,
-    color: '#ffffff',
-    fontSize: 13,
-    marginBottom: 14,
-  },
-  formTextarea: {
-    height: 70,
-    paddingTop: 10,
-    textAlignVertical: 'top',
-  },
-  formRow: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  formRowCol: {
-    flex: 1,
-  },
+
   modalButtons: {
     flexDirection: 'row',
     paddingBottom: Platform.OS === 'ios' ? 24 : 10,
