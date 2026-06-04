@@ -13,7 +13,7 @@ import {
   RefreshControl,
   Platform
 } from 'react-native';
-import { Plus, Trash2, ChevronRight, Sparkles, X, Heart } from 'lucide-react-native';
+import { Plus, Trash2, ChevronRight, Sparkles, X, Edit, Users, ShieldAlert } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { Colors, Typography, Gradients } from '../../constants/DesignSystem';
 import { MockAPI } from '../../api/mockData';
@@ -40,6 +40,7 @@ export default function VendorProducts() {
   const [minFollowers, setMinFollowers] = useState('');
   const [formError, setFormError] = useState('');
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [editProductId, setEditProductId] = useState<string | null>(null);
 
   const fetchProducts = () => {
     try {
@@ -62,7 +63,41 @@ export default function VendorProducts() {
     fetchProducts();
   };
 
-  const handleAddProduct = async () => {
+  const handleOpenAddModal = () => {
+    setName('');
+    setDescription('');
+    setPrice('');
+    setCommissionPct('');
+    setImageVal('');
+    setMaxInfluencers('');
+    setMinFollowers('');
+    setEditProductId(null);
+    setFormError('');
+    setShowModal(true);
+  };
+
+  const handleOpenEditModal = (item: any) => {
+    setName(item.name);
+    setDescription(item.description);
+    setPrice(item.price.toString());
+    setCommissionPct(item.commissionPct.toString());
+    
+    let parsedImages = [];
+    try {
+      parsedImages = JSON.parse(item.imageUrls);
+    } catch (e) {
+      parsedImages = [item.imageUrls];
+    }
+    setImageVal(parsedImages[0] || '');
+
+    setMaxInfluencers((item.maxInfluencers || 0).toString());
+    setMinFollowers((item.minFollowers || 0).toString());
+    setEditProductId(item.id);
+    setFormError('');
+    setShowModal(true);
+  };
+
+  const handleSaveProduct = async () => {
     if (!name || !description || !price || !commissionPct) {
       setFormError('Please fill in all required fields');
       return;
@@ -73,19 +108,31 @@ export default function VendorProducts() {
 
     await new Promise(resolve => setTimeout(resolve, 800));
 
-    const defaultImage = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80';
-    const finalImage = imageVal.trim() || defaultImage;
-
     try {
-      MockAPI.createProduct(
-        name,
-        description,
-        parseFloat(price),
-        parseInt(commissionPct, 10),
-        JSON.stringify([finalImage]),
-        maxInfluencers ? parseInt(maxInfluencers, 10) : 0,
-        minFollowers ? parseInt(minFollowers, 10) : 0
-      );
+      if (editProductId) {
+        MockAPI.updateProduct(
+          editProductId,
+          name,
+          description,
+          parseFloat(price),
+          parseInt(commissionPct, 10),
+          maxInfluencers ? parseInt(maxInfluencers, 10) : 0,
+          minFollowers ? parseInt(minFollowers, 10) : 0
+        );
+      } else {
+        const defaultImage = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80';
+        const finalImage = imageVal.trim() || defaultImage;
+
+        MockAPI.createProduct(
+          name,
+          description,
+          parseFloat(price),
+          parseInt(commissionPct, 10),
+          JSON.stringify([finalImage]),
+          maxInfluencers ? parseInt(maxInfluencers, 10) : 0,
+          minFollowers ? parseInt(minFollowers, 10) : 0
+        );
+      }
 
       setName('');
       setDescription('');
@@ -97,7 +144,7 @@ export default function VendorProducts() {
       setShowModal(false);
       fetchProducts();
     } catch (err: any) {
-      setFormError('Failed to upload product catalog asset');
+      setFormError(editProductId ? 'Failed to update product specs' : 'Failed to upload product catalog asset');
     } finally {
       setSubmitLoading(false);
     }
@@ -174,6 +221,22 @@ export default function VendorProducts() {
                       <ChevronRight size={18} color="#cbd5e1" />
                     </View>
                     <Text style={styles.productDesc} numberOfLines={2}>{item.description}</Text>
+
+                    {/* Restrictions Info Badges */}
+                    <View style={styles.cardRestrictionsRow}>
+                      <View style={styles.restrictionBadge}>
+                        <Users size={10} color="#0ea5e9" style={{ marginRight: 4 }} />
+                        <Text style={styles.restrictionText}>
+                          Limit: {item.maxInfluencers && item.maxInfluencers > 0 ? `${item.maxInfluencers} slots` : 'Unlimited'}
+                        </Text>
+                      </View>
+                      <View style={styles.restrictionBadge}>
+                        <ShieldAlert size={10} color="#f59e0b" style={{ marginRight: 4 }} />
+                        <Text style={styles.restrictionText}>
+                          Min Followers: {item.minFollowers && item.minFollowers > 0 ? `${item.minFollowers.toLocaleString()}` : 'None'}
+                        </Text>
+                      </View>
+                    </View>
                   </View>
                 </TouchableOpacity>
 
@@ -187,12 +250,20 @@ export default function VendorProducts() {
                       <Text style={styles.financialLabel}>Commission</Text>
                       <Text style={styles.commissionValue}>{item.commissionPct}% Payout</Text>
                     </View>
-                    <TouchableOpacity 
-                      onPress={() => handleDelete(item.id)}
-                      style={styles.deleteButton}
-                    >
-                      <Trash2 size={14} color="#ef4444" />
-                    </TouchableOpacity>
+                    <View style={styles.actionButtonsCol}>
+                      <TouchableOpacity 
+                        onPress={() => handleOpenEditModal(item)}
+                        style={styles.editCardButton}
+                      >
+                        <Edit size={13} color="#6366f1" />
+                      </TouchableOpacity>
+                      <TouchableOpacity 
+                        onPress={() => handleDelete(item.id)}
+                        style={styles.deleteButton}
+                      >
+                        <Trash2 size={13} color="#ef4444" />
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
               </GlassCard>
@@ -203,13 +274,13 @@ export default function VendorProducts() {
 
       {/* Floating Action Button */}
       <TouchableOpacity 
-        onPress={() => setShowModal(true)}
+        onPress={handleOpenAddModal}
         style={styles.fab}
       >
         <Plus size={24} color="#ffffff" />
       </TouchableOpacity>
 
-      {/* Add Product Modal */}
+      {/* Add / Edit Product Modal */}
       <Modal
         visible={showModal}
         animationType="slide"
@@ -219,7 +290,9 @@ export default function VendorProducts() {
         <View style={styles.modalOverlay}>
           <GlassCard style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Add Product Asset</Text>
+              <Text style={styles.modalTitle}>
+                {editProductId ? 'Edit Product Specs' : 'Add Product Asset'}
+              </Text>
               <TouchableOpacity onPress={() => { setShowModal(false); setFormError(''); }}>
                 <X size={18} color="#94a3b8" />
               </TouchableOpacity>
@@ -244,15 +317,15 @@ export default function VendorProducts() {
               setMaxInfluencers={setMaxInfluencers}
               minFollowers={minFollowers}
               setMinFollowers={setMinFollowers}
-              showImageInput={true}
+              showImageInput={!editProductId}
               imageVal={imageVal}
               setImageVal={setImageVal}
             />
 
             <View style={styles.modalButtons}>
               <GradientButton 
-                title="Publish to Marketplace"
-                onPress={handleAddProduct}
+                title={editProductId ? 'Save Specifications' : 'Publish to Marketplace'}
+                onPress={handleSaveProduct}
                 loading={submitLoading}
                 style={{ flex: 1 }}
                 icon={<Sparkles size={14} color="#fff" />}
@@ -423,5 +496,41 @@ const styles = StyleSheet.create({
   modalButtons: {
     flexDirection: 'row',
     paddingBottom: Platform.OS === 'ios' ? 24 : 10,
+  },
+  cardRestrictionsRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 8,
+    flexWrap: 'wrap',
+  },
+  restrictionBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(2, 6, 23, 0.4)',
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  restrictionText: {
+    fontSize: 9,
+    fontWeight: '600',
+    color: Colors.textLight,
+  },
+  actionButtonsCol: {
+    flexDirection: 'row',
+    gap: 8,
+    alignItems: 'center',
+  },
+  editCardButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: 'rgba(99, 102, 241, 0.08)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(99, 102, 241, 0.15)',
   },
 });
