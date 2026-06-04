@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { CircleDollarSign, MousePointerClick, TrendingUp, LogOut, ArrowRight, ShieldCheck } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, Typography, Shadows } from '../../constants/DesignSystem';
 import { MockAPI } from '../../api/mockData';
 import { useAuth } from '../../hooks/useAuth';
@@ -26,6 +27,23 @@ export default function VendorDashboard() {
     await logout();
     router.replace('/(auth)/splash' as any);
   };
+  const [isSimulating, setIsSimulating] = useState(false);
+
+  useEffect(() => {
+    let interval: any;
+    if (isSimulating) {
+      interval = setInterval(() => {
+        const activeCamps = MockAPI.getCampaigns().filter(c => c.status === 'ACTIVE');
+        if (activeCamps.length > 0) {
+          const randomCamp = activeCamps[Math.floor(Math.random() * activeCamps.length)];
+          const randomAmt = parseFloat((50 + Math.random() * 200).toFixed(2));
+          MockAPI.simulateCheckout(randomCamp.referralCode, randomAmt);
+          fetchAnalytics();
+        }
+      }, 5000);
+    }
+    return () => clearInterval(interval);
+  }, [isSimulating]);
   
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -111,6 +129,51 @@ export default function VendorDashboard() {
             size={80}
             strokeWidth={8}
           />
+        </GlassCard>
+
+        {/* Simulation Control Card */}
+        <GlassCard style={[styles.simulationCard, isSimulating ? styles.simulationCardActive : null]}>
+          <View style={styles.simLeft}>
+            <View style={styles.simHeaderRow}>
+              <View style={[styles.simPulse, isSimulating ? styles.simPulseActive : null]} />
+              <Text style={styles.simLabel}>LIVE PITCH SIMULATION MODULE</Text>
+            </View>
+            <Text style={styles.simHeading}>Auto-Generate incoming sales stream</Text>
+            <Text style={styles.simDesc}>
+              Simulates real-time creator conversions every 5 seconds to test metrics reactivity.
+            </Text>
+          </View>
+          <TouchableOpacity 
+            style={[styles.simToggle, isSimulating ? styles.simToggleOn : null]} 
+            onPress={() => setIsSimulating(!isSimulating)}
+          >
+            <Text style={styles.simToggleText}>{isSimulating ? 'STOP' : 'START'}</Text>
+          </TouchableOpacity>
+        </GlassCard>
+
+        {/* Performance Visualizer (7-Day Sales Bars) */}
+        <GlassCard style={styles.chartCard}>
+          <Text style={styles.chartTitle}>7-Day Sales Revenue Distribution</Text>
+          <View style={styles.chartContainer}>
+            {data?.dailySales?.map((item: any) => {
+              const maxVal = Math.max(...data.dailySales.map((d: any) => d.sales), 1);
+              const pct = (item.sales / maxVal) * 100;
+              return (
+                <View key={item.day} style={styles.barCol}>
+                  <View style={styles.barTrack}>
+                    <View style={[styles.barFill, { height: `${pct}%` }]}>
+                      <LinearGradient
+                        colors={['#6366f1', '#3b82f6']}
+                        style={StyleSheet.absoluteFill}
+                      />
+                    </View>
+                  </View>
+                  <Text style={styles.barLabel}>{item.day}</Text>
+                  <Text style={styles.barValue}>${Math.round(item.sales)}</Text>
+                </View>
+              );
+            })}
+          </View>
         </GlassCard>
 
         {/* Conversions feed */}
@@ -320,5 +383,131 @@ const styles = StyleSheet.create({
     color: '#ef4444',
     fontWeight: 'bold',
     fontSize: 12,
+  },
+  chartCard: {
+    marginBottom: 24,
+    borderWidth: 0.8,
+    borderColor: 'rgba(255,255,255,0.06)',
+  },
+  chartTitle: {
+    fontSize: 10,
+    color: Colors.textMuted,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    marginBottom: 16,
+  },
+  chartContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    height: 120,
+    paddingTop: 10,
+  },
+  barCol: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  barTrack: {
+    width: 12,
+    height: 80,
+    backgroundColor: '#1e293b',
+    borderRadius: 6,
+    overflow: 'hidden',
+    justifyContent: 'flex-end',
+  },
+  barFill: {
+    width: '100%',
+    borderRadius: 6,
+  },
+  barLabel: {
+    fontSize: 9,
+    color: Colors.textMuted,
+    marginTop: 6,
+    fontWeight: '600',
+  },
+  barValue: {
+    fontSize: 8,
+    color: Colors.textLight,
+    marginTop: 2,
+    fontWeight: '500',
+  },
+  simulationCard: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
+    backgroundColor: 'rgba(99, 102, 241, 0.02)',
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+    borderWidth: 0.8,
+  },
+  simulationCardActive: {
+    borderColor: 'rgba(99, 102, 241, 0.25)',
+    backgroundColor: 'rgba(99, 102, 241, 0.04)',
+    shadowColor: '#6366f1',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  simLeft: {
+    flex: 1,
+    marginRight: 12,
+  },
+  simHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 4,
+  },
+  simPulse: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#64748b',
+  },
+  simPulseActive: {
+    backgroundColor: '#10b981',
+    shadowColor: '#10b981',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  simLabel: {
+    fontSize: 8,
+    fontWeight: '800',
+    color: Colors.textMuted,
+    letterSpacing: 1,
+  },
+  simHeading: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+  simDesc: {
+    fontSize: 10,
+    color: Colors.textLight,
+    marginTop: 2,
+    lineHeight: 14,
+  },
+  simToggle: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1,
+    borderColor: Colors.border,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minWidth: 60,
+  },
+  simToggleOn: {
+    backgroundColor: '#6366f1',
+    borderColor: '#6366f1',
+  },
+  simToggleText: {
+    color: '#ffffff',
+    fontSize: 10,
+    fontWeight: '800',
   },
 });
