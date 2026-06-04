@@ -11,14 +11,16 @@ import {
   RefreshControl,
   Alert
 } from 'react-native';
-import { Search, Store, CheckCircle, Clock, Heart, Award } from 'lucide-react-native';
+import { Search, Store, CheckCircle, Clock, Heart, Award, Users } from 'lucide-react-native';
 import { Colors, Typography, Gradients } from '../../constants/DesignSystem';
 import { MockAPI } from '../../api/mockData';
+import { useAuth } from '../../hooks/useAuth';
 import MeshBackground from '../../components/MeshBackground';
 import GlassCard from '../../components/GlassCard';
 import Badge from '../../components/Badge';
 
 export default function InfluencerMarketplace() {
+  const { user } = useAuth();
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -29,13 +31,22 @@ export default function InfluencerMarketplace() {
     try {
       const allProds = MockAPI.getProducts().filter(p => p.status === 'APPROVED');
       const influencerCamps = MockAPI.getInfluencerCampaigns();
+      const allCamps = MockAPI.getCampaigns();
+      const currentInfluencer = MockAPI.getInfluencers().find(inf => inf.userId === user?.id) || MockAPI.getInfluencers()[0];
 
       const mapped = allProds.map(p => {
         const camp = influencerCamps.find(c => c.productId === p.id);
+        const activePromotersCount = allCamps.filter(c => c.productId === p.id && c.status === 'ACTIVE').length;
+        const isLocked = p.minFollowers ? (currentInfluencer.followers < p.minFollowers) : false;
+        const isFilled = p.maxInfluencers ? (activePromotersCount >= p.maxInfluencers) : false;
+
         return {
           ...p,
           promotionStatus: camp ? camp.status : null,
-          campaignId: camp ? camp.id : null
+          campaignId: camp ? camp.id : null,
+          activePromotersCount,
+          isLocked,
+          isFilled
         };
       });
 
@@ -154,9 +165,39 @@ export default function InfluencerMarketplace() {
                     </View>
                   </View>
 
+                  {/* Requirements and caps indicators */}
+                  {(item.minFollowers > 0 || item.maxInfluencers > 0) && (
+                    <View style={styles.criteriaRow}>
+                      {item.minFollowers > 0 && (
+                        <View style={styles.criteriaBadge}>
+                          <Users size={10} color="#64748b" style={{ marginRight: 4 }} />
+                          <Text style={styles.criteriaText}>{item.minFollowers.toLocaleString()}+ followers</Text>
+                        </View>
+                      )}
+                      {item.maxInfluencers > 0 && (
+                        <View style={styles.criteriaBadge}>
+                          <Award size={10} color="#64748b" style={{ marginRight: 4 }} />
+                          <Text style={styles.criteriaText}>
+                            Cap: {item.activePromotersCount}/{item.maxInfluencers} partners
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                  )}
+
                   {/* Promotion actions buttons */}
                   <View style={styles.actionBtnContainer}>
-                    {item.promotionStatus === 'ACTIVE' ? (
+                    {item.isLocked ? (
+                      <View style={styles.statusBadgeLocked}>
+                        <Clock size={12} color="#64748b" style={{ marginRight: 6 }} />
+                        <Text style={styles.badgeTextLocked}>Locked: Requires {item.minFollowers.toLocaleString()}+ Followers</Text>
+                      </View>
+                    ) : item.isFilled ? (
+                      <View style={styles.statusBadgeLocked}>
+                        <Clock size={12} color="#64748b" style={{ marginRight: 6 }} />
+                        <Text style={styles.badgeTextLocked}>Closed: Promoter Cap Filled</Text>
+                      </View>
+                    ) : item.promotionStatus === 'ACTIVE' ? (
                       <View style={styles.statusBadgeActive}>
                         <CheckCircle size={14} color="#10b981" style={{ marginRight: 6 }} />
                         <Text style={styles.badgeTextActive}>Active Campaign</Text>
@@ -350,6 +391,41 @@ const styles = StyleSheet.create({
   },
   badgeTextPending: {
     color: '#f59e0b',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  criteriaRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 10,
+  },
+  criteriaBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderRadius: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  criteriaText: {
+    fontSize: 9,
+    fontWeight: '600',
+    color: '#64748b',
+  },
+  statusBadgeLocked: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(2, 6, 23, 0.5)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.04)',
+    borderRadius: 12,
+    height: 40,
+  },
+  badgeTextLocked: {
+    color: '#64748b',
     fontSize: 11,
     fontWeight: '700',
   },

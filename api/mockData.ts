@@ -32,6 +32,8 @@ export interface Product {
   vendor: {
     companyName: string;
   };
+  maxInfluencers?: number;
+  minFollowers?: number;
 }
 
 export interface Influencer {
@@ -177,7 +179,9 @@ let products: Product[] = [
     imageUrls: JSON.stringify(['https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80']),
     status: 'APPROVED',
     vendorId: 'vend-1',
-    vendor: { companyName: 'GearUp Labs' }
+    vendor: { companyName: 'GearUp Labs' },
+    maxInfluencers: 5,
+    minFollowers: 5000
   },
   {
     id: 'prod-2',
@@ -188,7 +192,9 @@ let products: Product[] = [
     imageUrls: JSON.stringify(['https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80']),
     status: 'APPROVED',
     vendorId: 'vend-1',
-    vendor: { companyName: 'GearUp Labs' }
+    vendor: { companyName: 'GearUp Labs' },
+    maxInfluencers: 2,
+    minFollowers: 10000
   },
   {
     id: 'prod-3',
@@ -199,7 +205,9 @@ let products: Product[] = [
     imageUrls: JSON.stringify(['https://images.unsplash.com/photo-1608248597481-496100c80836?auto=format&fit=crop&w=600&q=80']),
     status: 'PENDING',
     vendorId: 'vend-2',
-    vendor: { companyName: 'Aura Cosmetics' }
+    vendor: { companyName: 'Aura Cosmetics' },
+    maxInfluencers: 3,
+    minFollowers: 25000
   },
   {
     id: 'prod-4',
@@ -210,7 +218,9 @@ let products: Product[] = [
     imageUrls: JSON.stringify(['https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=600&q=80']),
     status: 'APPROVED',
     vendorId: 'vend-3',
-    vendor: { companyName: 'Apex Apparel' }
+    vendor: { companyName: 'Apex Apparel' },
+    maxInfluencers: 1,
+    minFollowers: 200000
   }
 ];
 
@@ -361,7 +371,7 @@ export const MockAPI = {
 
   // Products Controller
   getProducts: () => products,
-  createProduct: (name: string, description: string, price: number, commissionPct: number, imageUrls: string) => {
+  createProduct: (name: string, description: string, price: number, commissionPct: number, imageUrls: string, maxInfluencers?: number, minFollowers?: number) => {
     const currentVendor = vendors.find(v => v.userId === currentUser?.id) || vendors[0];
     const newProd: Product = {
       id: `prod-${Math.random().toString(36).substr(2, 9)}`,
@@ -372,10 +382,26 @@ export const MockAPI = {
       imageUrls,
       status: 'PENDING',
       vendorId: currentVendor.id,
-      vendor: { companyName: currentVendor.companyName }
+      vendor: { companyName: currentVendor.companyName },
+      maxInfluencers: maxInfluencers || 0,
+      minFollowers: minFollowers || 0
     };
     products.push(newProd);
     return newProd;
+  },
+  updateProduct: (id: string, name: string, description: string, price: number, commissionPct: number, maxInfluencers?: number, minFollowers?: number) => {
+    products = products.map(p => {
+      if (p.id === id) {
+        p.name = name;
+        p.description = description;
+        p.price = price;
+        p.commissionPct = commissionPct;
+        p.maxInfluencers = maxInfluencers || 0;
+        p.minFollowers = minFollowers || 0;
+      }
+      return p;
+    });
+    return products.find(p => p.id === id);
   },
   deleteProduct: (id: string) => {
     products = products.filter(p => p.id !== id);

@@ -1,18 +1,44 @@
-import React from 'react';
-import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, Platform, Modal, TextInput, ActivityIndicator, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ArrowLeft, BarChart2, ShieldCheck, Tag, DollarSign, MousePointerClick } from 'lucide-react-native';
+import { ArrowLeft, BarChart2, ShieldCheck, Tag, DollarSign, MousePointerClick, Edit, X, Users, ShieldAlert, Sparkles } from 'lucide-react-native';
 import { Colors, Typography, Gradients } from '../../constants/DesignSystem';
 import { MockAPI } from '../../api/mockData';
 import MeshBackground from '../../components/MeshBackground';
 import GlassCard from '../../components/GlassCard';
 import Badge from '../../components/Badge';
+import GradientButton from '../../components/GradientButton';
 
 export default function ProductDetails() {
   const router = useRouter();
   const { productId } = useLocalSearchParams();
 
-  const product = MockAPI.getProducts().find(p => p.id === productId);
+  const [product, setProduct] = useState<any>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // Edit fields state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [price, setPrice] = useState('');
+  const [commissionPct, setCommissionPct] = useState('');
+  const [maxInfluencers, setMaxInfluencers] = useState('');
+  const [minFollowers, setMinFollowers] = useState('');
+  const [editError, setEditError] = useState('');
+  const [saveLoading, setSaveLoading] = useState(false);
+
+  useEffect(() => {
+    const p = MockAPI.getProducts().find(item => item.id === productId);
+    if (p) {
+      setProduct(p);
+      setName(p.name);
+      setDescription(p.description);
+      setPrice(p.price.toString());
+      setCommissionPct(p.commissionPct.toString());
+      setMaxInfluencers((p.maxInfluencers || 0).toString());
+      setMinFollowers((p.minFollowers || 0).toString());
+    }
+  }, [productId, refreshTrigger]);
 
   if (!product) {
     return (
@@ -35,21 +61,56 @@ export default function ProductDetails() {
   const imgUri = parsedImages[0] || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80';
 
   // Compute simulated product KPIs
-  const productCampaigns = MockAPI.getCampaigns().filter(c => c.productId === product.id);
+  const productCampaigns = MockAPI.getCampaigns().filter(c => c.productId === product.id && c.status === 'ACTIVE');
   const totalClicks = productCampaigns.reduce((sum, c) => sum + c.clicks, 0);
   const totalConversions = productCampaigns.reduce((sum, c) => sum + c.conversions, 0);
   const totalRevenue = productCampaigns.reduce((sum, c) => sum + c.totalRevenue, 0);
 
+  const handleSave = async () => {
+    if (!name || !description || !price || !commissionPct) {
+      setEditError('Please fill in all required fields');
+      return;
+    }
+
+    setEditError('');
+    setSaveLoading(true);
+
+    // Simulate mock save delay for premium feel
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    try {
+      MockAPI.updateProduct(
+        product.id,
+        name,
+        description,
+        parseFloat(price),
+        parseInt(commissionPct, 10),
+        maxInfluencers ? parseInt(maxInfluencers, 10) : 0,
+        minFollowers ? parseInt(minFollowers, 10) : 0
+      );
+      
+      setRefreshTrigger(prev => prev + 1);
+      setShowEditModal(false);
+      Alert.alert('Success', 'Product specifications updated successfully');
+    } catch (e) {
+      setEditError('Failed to update specifications');
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
   return (
     <MeshBackground style={{ flex: 1 }}>
       <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
-        {/* Back Button */}
+        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.circleBtn} onPress={() => router.back()}>
             <ArrowLeft size={16} color="#ffffff" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Product Analytics</Text>
-          <View style={{ width: 36 }} />
+          <TouchableOpacity style={styles.circleBtn} onPress={() => setShowEditModal(true)}>
+            <Edit size={14} color="#ffffff" />
+          </TouchableOpacity>
         </View>
 
         {/* Hero Image */}
@@ -69,16 +130,39 @@ export default function ProductDetails() {
           <Text style={styles.brandName}>Vendor: {product.vendor.companyName}</Text>
           <Text style={styles.description}>{product.description}</Text>
 
+          {/* Catalog specifications */}
           <View style={styles.specsRow}>
             <View style={styles.specBox}>
-              <Tag size={14} color="#6366f1" />
+              <Tag size={12} color="#6366f1" />
               <Text style={styles.specLabel}>Retail Price</Text>
               <Text style={styles.specValue}>${product.price.toFixed(2)}</Text>
             </View>
             <View style={styles.specBox}>
-              <DollarSign size={14} color="#10b981" />
+              <DollarSign size={12} color="#10b981" />
               <Text style={styles.specLabel}>Commission Rate</Text>
               <Text style={[styles.specValue, { color: '#10b981' }]}>{product.commissionPct}%</Text>
+            </View>
+          </View>
+
+          {/* Restriction specifications */}
+          <View style={[styles.specsRow, { marginTop: 12, borderTopWidth: 0, paddingTop: 0 }]}>
+            <View style={styles.specBox}>
+              <Users size={12} color="#0ea5e9" />
+              <Text style={styles.specLabel}>Promoter Limit</Text>
+              <Text style={styles.specValue}>
+                {product.maxInfluencers && product.maxInfluencers > 0 
+                  ? `${productCampaigns.length} / ${product.maxInfluencers} Slots` 
+                  : 'Unlimited'}
+              </Text>
+            </View>
+            <View style={styles.specBox}>
+              <ShieldAlert size={12} color="#f59e0b" />
+              <Text style={styles.specLabel}>Min Followers</Text>
+              <Text style={styles.specValue}>
+                {product.minFollowers && product.minFollowers > 0 
+                  ? `${product.minFollowers.toLocaleString()}+` 
+                  : 'None'}
+              </Text>
             </View>
           </View>
         </GlassCard>
@@ -110,10 +194,118 @@ export default function ProductDetails() {
             <Text style={styles.promotersTitle}>Active Partnerships</Text>
           </View>
           <Text style={styles.promotersDesc}>
-            There are currently {productCampaigns.length} influencers promoting this asset in social networks.
+            There are currently {productCampaigns.length} influencers actively promoting this catalog asset.
           </Text>
         </GlassCard>
       </ScrollView>
+
+      {/* Edit Specifications Modal */}
+      <Modal
+        visible={showEditModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowEditModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <GlassCard style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Edit Product Specs</Text>
+              <TouchableOpacity onPress={() => { setShowEditModal(false); setEditError(''); }}>
+                <X size={18} color="#94a3b8" />
+              </TouchableOpacity>
+            </View>
+
+            {editError ? (
+              <View style={styles.formErrorBanner}>
+                <Text style={styles.formErrorText}>{editError}</Text>
+              </View>
+            ) : null}
+
+            <ScrollView style={styles.formScroll} showsVerticalScrollIndicator={false}>
+              <Text style={styles.formLabel}>Product Name *</Text>
+              <TextInput
+                value={name}
+                onChangeText={setName}
+                placeholder="e.g. Apex Trail Running Shoes"
+                placeholderTextColor="#475569"
+                style={styles.formInput}
+              />
+
+              <Text style={styles.formLabel}>Description Specs *</Text>
+              <TextInput
+                value={description}
+                onChangeText={setDescription}
+                placeholder="Details..."
+                placeholderTextColor="#475569"
+                multiline
+                numberOfLines={3}
+                style={[styles.formInput, styles.formTextarea]}
+              />
+
+              <View style={styles.formRow}>
+                <View style={styles.formRowCol}>
+                  <Text style={styles.formLabel}>Price ($) *</Text>
+                  <TextInput
+                    value={price}
+                    onChangeText={setPrice}
+                    placeholder="159.99"
+                    placeholderTextColor="#475569"
+                    keyboardType="numeric"
+                    style={styles.formInput}
+                  />
+                </View>
+                <View style={styles.formRowCol}>
+                  <Text style={styles.formLabel}>Commission (%) *</Text>
+                  <TextInput
+                    value={commissionPct}
+                    onChangeText={setCommissionPct}
+                    placeholder="15"
+                    placeholderTextColor="#475569"
+                    keyboardType="numeric"
+                    style={styles.formInput}
+                  />
+                </View>
+              </View>
+
+              <Text style={[styles.formLabel, { color: Colors.primary }]}>Target Restrictions</Text>
+              <View style={styles.formRow}>
+                <View style={styles.formRowCol}>
+                  <Text style={styles.formLabel}>Max Promoters (Cap)</Text>
+                  <TextInput
+                    value={maxInfluencers}
+                    onChangeText={setMaxInfluencers}
+                    placeholder="e.g. 5 (0 = Unlimited)"
+                    placeholderTextColor="#475569"
+                    keyboardType="numeric"
+                    style={styles.formInput}
+                  />
+                </View>
+                <View style={styles.formRowCol}>
+                  <Text style={styles.formLabel}>Min Followers Required</Text>
+                  <TextInput
+                    value={minFollowers}
+                    onChangeText={setMinFollowers}
+                    placeholder="e.g. 10000"
+                    placeholderTextColor="#475569"
+                    keyboardType="numeric"
+                    style={styles.formInput}
+                  />
+                </View>
+              </View>
+            </ScrollView>
+
+            <View style={styles.modalButtons}>
+              <GradientButton 
+                title="Save Specifications"
+                onPress={handleSave}
+                loading={saveLoading}
+                style={{ flex: 1 }}
+                icon={<Sparkles size={14} color="#fff" />}
+              />
+            </View>
+          </GlassCard>
+        </View>
+      </Modal>
     </MeshBackground>
   );
 }
@@ -239,7 +431,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   specValue: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: 'bold',
     color: '#ffffff',
     marginTop: 2,
@@ -295,5 +487,83 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: Colors.textLight,
     lineHeight: 16,
-  }
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(2, 6, 23, 0.85)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+  formScroll: {
+    maxHeight: 400,
+    marginBottom: 20,
+  },
+  formLabel: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: Colors.textLight,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 6,
+    marginTop: 12,
+  },
+  formInput: {
+    backgroundColor: 'rgba(2, 6, 23, 0.6)',
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    color: '#ffffff',
+    fontSize: 13,
+    height: 48,
+    marginBottom: 12,
+  },
+  formTextarea: {
+    height: 80,
+    paddingVertical: 10,
+    textAlignVertical: 'top',
+  },
+  formRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 12,
+  },
+  formRowCol: {
+    flex: 1,
+  },
+  formErrorBanner: {
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(239, 68, 68, 0.3)',
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 16,
+  },
+  formErrorText: {
+    color: '#ef4444',
+    fontSize: 11,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: 10,
+  },
 });

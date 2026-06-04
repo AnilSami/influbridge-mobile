@@ -35,6 +35,8 @@ export default function VendorProducts() {
   const [price, setPrice] = useState('');
   const [commissionPct, setCommissionPct] = useState('');
   const [imageVal, setImageVal] = useState('');
+  const [maxInfluencers, setMaxInfluencers] = useState('');
+  const [minFollowers, setMinFollowers] = useState('');
   const [formError, setFormError] = useState('');
   const [submitLoading, setSubmitLoading] = useState(false);
 
@@ -79,7 +81,9 @@ export default function VendorProducts() {
         description,
         parseFloat(price),
         parseInt(commissionPct, 10),
-        JSON.stringify([finalImage])
+        JSON.stringify([finalImage]),
+        maxInfluencers ? parseInt(maxInfluencers, 10) : 0,
+        minFollowers ? parseInt(minFollowers, 10) : 0
       );
 
       setName('');
@@ -87,6 +91,8 @@ export default function VendorProducts() {
       setPrice('');
       setCommissionPct('');
       setImageVal('');
+      setMaxInfluencers('');
+      setMinFollowers('');
       setShowModal(false);
       fetchProducts();
     } catch (err: any) {
@@ -274,6 +280,32 @@ export default function VendorProducts() {
                 autoCapitalize="none"
                 style={styles.formInput}
               />
+
+              <Text style={[styles.formLabel, { color: Colors.primary, marginTop: 12 }]}>Promoter Restrictions</Text>
+              <View style={styles.formRow}>
+                <View style={styles.formRowCol}>
+                  <Text style={styles.formLabel}>Max Promoters (Cap)</Text>
+                  <TextInput
+                    value={maxInfluencers}
+                    onChangeText={setMaxInfluencers}
+                    placeholder="e.g. 5 (0 = Unlimited)"
+                    placeholderTextColor="#475569"
+                    keyboardType="numeric"
+                    style={styles.formInput}
+                  />
+                </View>
+                <View style={styles.formRowCol}>
+                  <Text style={styles.formLabel}>Min Followers</Text>
+                  <TextInput
+                    value={minFollowers}
+                    onChangeText={setMinFollowers}
+                    placeholder="e.g. 10000"
+                    placeholderTextColor="#475569"
+                    keyboardType="numeric"
+                    style={styles.formInput}
+                  />
+                </View>
+              </View>
             </ScrollView>
 
             <View style={styles.modalButtons}>
