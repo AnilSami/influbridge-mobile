@@ -7,7 +7,8 @@ import {
   TouchableOpacity, 
   KeyboardAvoidingView, 
   Platform,
-  ScrollView 
+  ScrollView,
+  Image
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Mail, Lock, ArrowRight, Shield, User, Users } from 'lucide-react-native';
@@ -48,13 +49,13 @@ export default function LoginScreen() {
   const autoFill = (role: 'VENDOR' | 'INFLUENCER' | 'ADMIN') => {
     setError('');
     if (role === 'VENDOR') {
-      setEmail('vendor@influbridge.com');
+      setEmail('vendor@brandly.com');
       setPassword('••••••••');
     } else if (role === 'INFLUENCER') {
-      setEmail('influencer@influbridge.com');
+      setEmail('influencer@brandly.com');
       setPassword('••••••••');
     } else {
-      setEmail('admin@influbridge.com');
+      setEmail('admin@brandly.com');
       setPassword('••••••••');
     }
   };
@@ -67,7 +68,11 @@ export default function LoginScreen() {
       >
         <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
           <View style={styles.brandContainer}>
-            <Text style={styles.logoText}>InfluBridge</Text>
+            <Image 
+              source={require('../../assets/images/brandly_logo.png')} 
+              style={styles.brandLogo} 
+            />
+            <Text style={styles.logoText}>Brandly</Text>
             <Text style={styles.logoSubtitle}>Affiliate Ecosystem</Text>
           </View>
 
@@ -88,7 +93,7 @@ export default function LoginScreen() {
               <TextInput
                 value={email}
                 onChangeText={setEmail}
-                placeholder="e.g. agency@influbridge.com"
+                placeholder="e.g. agency@brandly.com"
                 placeholderTextColor="#475569"
                 autoCapitalize="none"
                 keyboardType="email-address"
@@ -163,6 +168,13 @@ const styles = StyleSheet.create({
   brandContainer: {
     alignItems: 'center',
     marginBottom: 30,
+  },
+  brandLogo: {
+    width: 64,
+    height: 64,
+    borderRadius: 18,
+    marginBottom: 10,
+    ...Shadows.glowPrimary,
   },
   logoText: {
     fontSize: 28,

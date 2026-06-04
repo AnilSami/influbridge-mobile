@@ -66,11 +66,12 @@ export default function InfluencerDashboard() {
   ];
 
   return (
-    <ScrollView 
-      style={styles.container} 
-      contentContainerStyle={styles.contentContainer}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#10b981" />}
-    >
+    <MeshBackground style={{ flex: 1 }}>
+      <ScrollView 
+        style={styles.container} 
+        contentContainerStyle={styles.contentContainer}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#10b981" />}
+      >
       {/* Title */}
       <View style={styles.header}>
         <View>
@@ -161,14 +162,14 @@ export default function InfluencerDashboard() {
         <LogOut size={14} color="#ef4444" style={styles.logoutIcon} />
         <Text style={styles.logoutText}>Sign Out of Influencer Portal</Text>
       </TouchableOpacity>
-    </ScrollView>
+      </ScrollView>
+    </MeshBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
   contentContainer: {
     padding: 20,

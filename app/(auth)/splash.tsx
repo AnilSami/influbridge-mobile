@@ -22,10 +22,11 @@ export default function SplashScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Brand Header */}
         <View style={styles.brandSection}>
-          <View style={styles.logoCircle}>
-            <Sparkles size={26} color="#6366f1" />
-          </View>
-          <Text style={styles.logoText}>InfluBridge</Text>
+          <Image 
+            source={require('../../assets/images/brandly_logo.png')} 
+            style={styles.brandLogo} 
+          />
+          <Text style={styles.logoText}>Brandly</Text>
           <Text style={styles.tagline}>Creator Affiliate Ledger</Text>
         </View>
 
@@ -129,15 +130,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 28,
   },
-  logoCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: 'rgba(99, 102, 241, 0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(99, 102, 241, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
+  brandLogo: {
+    width: 64,
+    height: 64,
+    borderRadius: 18,
     marginBottom: 14,
     ...Shadows.glowPrimary,
   },

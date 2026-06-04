@@ -543,13 +543,34 @@ export const MockAPI = {
     const totalRevenue = vOrders.reduce((sum, o) => sum + o.amount, 0);
     const commissionPaid = vOrders.reduce((sum, o) => sum + o.commission, 0);
 
+    // Compute weekly daily sales distribution
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const dailyMap: { [key: string]: number } = { Mon: 120.0, Tue: 240.0, Wed: 190.0, Thu: 480.0, Fri: 220.0, Sat: 610.0, Sun: 380.0 };
+
+    vOrders.forEach(o => {
+      const date = new Date(o.createdAt);
+      const dayName = days[date.getDay()];
+      dailyMap[dayName] = parseFloat((dailyMap[dayName] + o.amount).toFixed(2));
+    });
+
+    const dailySales = [
+      { day: 'Mon', sales: dailyMap['Mon'] },
+      { day: 'Tue', sales: dailyMap['Tue'] },
+      { day: 'Wed', sales: dailyMap['Wed'] },
+      { day: 'Thu', sales: dailyMap['Thu'] },
+      { day: 'Fri', sales: dailyMap['Fri'] },
+      { day: 'Sat', sales: dailyMap['Sat'] },
+      { day: 'Sun', sales: dailyMap['Sun'] },
+    ];
+
     return {
       clicks,
       conversions,
       totalRevenue,
       commissionPaid,
       activeCampaignsCount: activeCount,
-      orders: vOrders
+      orders: vOrders,
+      dailySales
     };
   },
   getInfluencerAnalytics: () => {
