@@ -146,7 +146,7 @@ export default function AdminConsole() {
           <ShieldCheck size={20} color="#10b981" style={{ marginBottom: 6 }} />
           <Text style={styles.safetyTitle}>Security Core Online</Text>
           <Text style={styles.safetyDesc}>
-            Mock database arrays are active. Sandbox user bypass state is listening successfully on Metro bunder.
+            Mock database arrays are active. Sandbox user bypass state is listening successfully on Metro bundler.
           </Text>
         </GlassCard>
 

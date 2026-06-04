@@ -84,6 +84,7 @@ export default function VendorRequests() {
   };
 
   const copyToClipboard = (text: string) => {
+    RNClipboard.setString(text);
     Alert.alert('Copied', 'Referral link copied to clipboard!');
   };
 

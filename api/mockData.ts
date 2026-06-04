@@ -1,4 +1,4 @@
-// Mock Data Layer for the Premium InfluBridge Mobile UI Prototype
+// Mock Data Layer for the Premium Brandly Mobile UI Prototype
 // Drives all screens in memory to bypass backend database latency and auth logic
 
 export interface User {
@@ -230,8 +230,8 @@ let campaigns: Campaign[] = [
     productId: 'prod-1',
     influencerId: 'inf-1',
     status: 'ACTIVE',
-    referralCode: 'IB-RUN-AUD-3829',
-    referralLink: 'http://localhost:5000/api/track/click/IB-RUN-AUD-3829',
+    referralCode: 'BL-RUN-AUD-3829',
+    referralLink: 'http://localhost:5000/api/track/click/BL-RUN-AUD-3829',
     couponCode: 'AUDREYFITNESS15',
     clicks: 142,
     conversions: 8,
@@ -256,8 +256,8 @@ let campaigns: Campaign[] = [
     productId: 'prod-2',
     influencerId: 'inf-1',
     status: 'PENDING',
-    referralCode: 'IB-HYD-AUD-8921',
-    referralLink: 'http://localhost:5000/api/track/click/IB-HYD-AUD-8921',
+    referralCode: 'BL-HYD-AUD-8921',
+    referralLink: 'http://localhost:5000/api/track/click/BL-HYD-AUD-8921',
     couponCode: null,
     clicks: 0,
     conversions: 0,
@@ -454,8 +454,8 @@ export const MockAPI = {
       productId,
       influencerId: currentInfluencer.id,
       status: 'PENDING',
-      referralCode: `IB-${product.name.slice(0, 3).toUpperCase()}-${currentInfluencer.displayName.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
-      referralLink: `http://localhost:5000/api/track/click/IB-MOCK`,
+      referralCode: `BL-${product.name.slice(0, 3).toUpperCase()}-${currentInfluencer.displayName.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
+      referralLink: `http://localhost:5000/api/track/click/BL-MOCK`,
       couponCode: null,
       clicks: 0,
       conversions: 0,

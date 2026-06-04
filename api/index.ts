@@ -19,7 +19,7 @@ export const api = axios.create({
 // Attach token dynamically from AsyncStorage
 api.interceptors.request.use(
   async (config) => {
-    const token = await AsyncStorage.getItem('ib_token');
+    const token = await AsyncStorage.getItem('brandly_token');
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }

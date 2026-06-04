@@ -10,7 +10,8 @@ import {
   TextInput,
   Alert,
   RefreshControl,
-  Platform
+  Platform,
+  Clipboard as RNClipboard
 } from 'react-native';
 import { Clipboard, Play, MousePointerClick, TrendingUp, DollarSign, HelpCircle, X, CreditCard, Lock } from 'lucide-react-native';
 import { Colors, Typography, Gradients } from '../../constants/DesignSystem';
@@ -58,6 +59,7 @@ export default function InfluencerCampaigns() {
   };
 
   const copyToClipboard = (text: string) => {
+    RNClipboard.setString(text);
     Alert.alert('Link Copied', 'Campaign tracking link copied to clipboard!');
   };
 
