@@ -18,15 +18,15 @@ export default function IndexPage() {
   }
 
   if (user.role === 'VENDOR') {
-    return <Redirect href="/(vendor)" />;
+    return <Redirect href={"/(vendor)/" as any} />;
   }
 
   if (user.role === 'INFLUENCER') {
-    return <Redirect href="/(influencer)" />;
+    return <Redirect href={"/(influencer)/" as any} />;
   }
 
   if (user.role === 'ADMIN') {
-    return <Redirect href="/(admin)" />;
+    return <Redirect href={"/(admin)/" as any} />;
   }
 
   return <Redirect href={"/(auth)/splash" as any} />;
