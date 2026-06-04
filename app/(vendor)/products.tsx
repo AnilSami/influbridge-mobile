@@ -21,6 +21,7 @@ import MeshBackground from '../../components/MeshBackground';
 import GlassCard from '../../components/GlassCard';
 import Badge from '../../components/Badge';
 import GradientButton from '../../components/GradientButton';
+import ProductForm from '../../components/ProductForm';
 
 export default function VendorProducts() {
   const router = useRouter();
@@ -42,7 +43,7 @@ export default function VendorProducts() {
 
   const fetchProducts = () => {
     try {
-      const allProds = MockAPI.getProducts();
+      const allProds = MockAPI.getVendorProducts();
       setProducts(allProds);
     } catch (err) {
       console.error('Error fetching products:', err);
@@ -151,27 +152,32 @@ export default function VendorProducts() {
 
             return (
               <GlassCard key={item.id} style={styles.productCard}>
-                <View style={styles.imageContainer}>
-                  <Image source={{ uri: imgUri }} style={styles.productImage} />
-                  <View style={styles.badgeOverlay}>
-                    <Badge 
-                      label={item.status} 
-                      type={item.status === 'APPROVED' ? 'success' : item.status === 'REJECTED' ? 'error' : 'warning'} 
-                    />
+                <TouchableOpacity 
+                  onPress={() => router.push({
+                    pathname: '/(vendor)/product-details' as any,
+                    params: { productId: item.id }
+                  })}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.imageContainer}>
+                    <Image source={{ uri: imgUri }} style={styles.productImage} />
+                    <View style={styles.badgeOverlay}>
+                      <Badge 
+                        label={item.status} 
+                        type={item.status === 'APPROVED' ? 'success' : item.status === 'REJECTED' ? 'error' : 'warning'} 
+                      />
+                    </View>
                   </View>
-                </View>
-                <View style={styles.cardBody}>
-                  <View style={styles.row}>
-                    <Text style={styles.productName}>{item.name}</Text>
-                    <TouchableOpacity onPress={() => router.push({
-                      pathname: '/(vendor)/product-details' as any,
-                      params: { productId: item.id }
-                    })}>
+                  <View style={[styles.cardBody, { paddingBottom: 0 }]}>
+                    <View style={styles.row}>
+                      <Text style={styles.productName}>{item.name}</Text>
                       <ChevronRight size={18} color="#cbd5e1" />
-                    </TouchableOpacity>
+                    </View>
+                    <Text style={styles.productDesc} numberOfLines={2}>{item.description}</Text>
                   </View>
-                  <Text style={styles.productDesc} numberOfLines={2}>{item.description}</Text>
-                  
+                </TouchableOpacity>
+
+                <View style={[styles.cardBody, { paddingTop: 0 }]}>
                   <View style={styles.financialsRow}>
                     <View>
                       <Text style={styles.financialLabel}>Catalog Price</Text>
@@ -225,88 +231,23 @@ export default function VendorProducts() {
               </View>
             ) : null}
 
-            <ScrollView style={styles.formScroll} showsVerticalScrollIndicator={false}>
-              <Text style={styles.formLabel}>Product Name *</Text>
-              <TextInput
-                value={name}
-                onChangeText={setName}
-                placeholder="e.g. Apex Trail Running Shoes"
-                placeholderTextColor="#475569"
-                style={styles.formInput}
-              />
-
-              <Text style={styles.formLabel}>Description Specifications *</Text>
-              <TextInput
-                value={description}
-                onChangeText={setDescription}
-                placeholder="Specifications, size ranges, marketing copies..."
-                placeholderTextColor="#475569"
-                multiline
-                numberOfLines={3}
-                style={[styles.formInput, styles.formTextarea]}
-              />
-
-              <View style={styles.formRow}>
-                <View style={styles.formRowCol}>
-                  <Text style={styles.formLabel}>Price ($) *</Text>
-                  <TextInput
-                    value={price}
-                    onChangeText={setPrice}
-                    placeholder="159.99"
-                    placeholderTextColor="#475569"
-                    keyboardType="numeric"
-                    style={styles.formInput}
-                  />
-                </View>
-                <View style={styles.formRowCol}>
-                  <Text style={styles.formLabel}>Commission (%) *</Text>
-                  <TextInput
-                    value={commissionPct}
-                    onChangeText={setCommissionPct}
-                    placeholder="15"
-                    placeholderTextColor="#475569"
-                    keyboardType="numeric"
-                    style={styles.formInput}
-                  />
-                </View>
-              </View>
-
-              <Text style={styles.formLabel}>Unsplash Image URL (Optional)</Text>
-              <TextInput
-                value={imageVal}
-                onChangeText={setImageVal}
-                placeholder="https://images.unsplash.com/..."
-                placeholderTextColor="#475569"
-                autoCapitalize="none"
-                style={styles.formInput}
-              />
-
-              <Text style={[styles.formLabel, { color: Colors.primary, marginTop: 12 }]}>Promoter Restrictions</Text>
-              <View style={styles.formRow}>
-                <View style={styles.formRowCol}>
-                  <Text style={styles.formLabel}>Max Promoters (Cap)</Text>
-                  <TextInput
-                    value={maxInfluencers}
-                    onChangeText={setMaxInfluencers}
-                    placeholder="e.g. 5 (0 = Unlimited)"
-                    placeholderTextColor="#475569"
-                    keyboardType="numeric"
-                    style={styles.formInput}
-                  />
-                </View>
-                <View style={styles.formRowCol}>
-                  <Text style={styles.formLabel}>Min Followers</Text>
-                  <TextInput
-                    value={minFollowers}
-                    onChangeText={setMinFollowers}
-                    placeholder="e.g. 10000"
-                    placeholderTextColor="#475569"
-                    keyboardType="numeric"
-                    style={styles.formInput}
-                  />
-                </View>
-              </View>
-            </ScrollView>
+            <ProductForm
+              name={name}
+              setName={setName}
+              description={description}
+              setDescription={setDescription}
+              price={price}
+              setPrice={setPrice}
+              commissionPct={commissionPct}
+              setCommissionPct={setCommissionPct}
+              maxInfluencers={maxInfluencers}
+              setMaxInfluencers={setMaxInfluencers}
+              minFollowers={minFollowers}
+              setMinFollowers={setMinFollowers}
+              showImageInput={true}
+              imageVal={imageVal}
+              setImageVal={setImageVal}
+            />
 
             <View style={styles.modalButtons}>
               <GradientButton 

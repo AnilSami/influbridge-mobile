@@ -8,6 +8,7 @@ import MeshBackground from '../../components/MeshBackground';
 import GlassCard from '../../components/GlassCard';
 import Badge from '../../components/Badge';
 import GradientButton from '../../components/GradientButton';
+import ProductForm from '../../components/ProductForm';
 
 export default function ProductDetails() {
   const router = useRouter();
@@ -221,78 +222,21 @@ export default function ProductDetails() {
               </View>
             ) : null}
 
-            <ScrollView style={styles.formScroll} showsVerticalScrollIndicator={false}>
-              <Text style={styles.formLabel}>Product Name *</Text>
-              <TextInput
-                value={name}
-                onChangeText={setName}
-                placeholder="e.g. Apex Trail Running Shoes"
-                placeholderTextColor="#475569"
-                style={styles.formInput}
-              />
-
-              <Text style={styles.formLabel}>Description Specs *</Text>
-              <TextInput
-                value={description}
-                onChangeText={setDescription}
-                placeholder="Details..."
-                placeholderTextColor="#475569"
-                multiline
-                numberOfLines={3}
-                style={[styles.formInput, styles.formTextarea]}
-              />
-
-              <View style={styles.formRow}>
-                <View style={styles.formRowCol}>
-                  <Text style={styles.formLabel}>Price ($) *</Text>
-                  <TextInput
-                    value={price}
-                    onChangeText={setPrice}
-                    placeholder="159.99"
-                    placeholderTextColor="#475569"
-                    keyboardType="numeric"
-                    style={styles.formInput}
-                  />
-                </View>
-                <View style={styles.formRowCol}>
-                  <Text style={styles.formLabel}>Commission (%) *</Text>
-                  <TextInput
-                    value={commissionPct}
-                    onChangeText={setCommissionPct}
-                    placeholder="15"
-                    placeholderTextColor="#475569"
-                    keyboardType="numeric"
-                    style={styles.formInput}
-                  />
-                </View>
-              </View>
-
-              <Text style={[styles.formLabel, { color: Colors.primary }]}>Target Restrictions</Text>
-              <View style={styles.formRow}>
-                <View style={styles.formRowCol}>
-                  <Text style={styles.formLabel}>Max Promoters (Cap)</Text>
-                  <TextInput
-                    value={maxInfluencers}
-                    onChangeText={setMaxInfluencers}
-                    placeholder="e.g. 5 (0 = Unlimited)"
-                    placeholderTextColor="#475569"
-                    keyboardType="numeric"
-                    style={styles.formInput}
-                  />
-                </View>
-                <View style={styles.formRowCol}>
-                  <Text style={styles.formLabel}>Min Followers Required</Text>
-                  <TextInput
-                    value={minFollowers}
-                    onChangeText={setMinFollowers}
-                    placeholder="e.g. 10000"
-                    placeholderTextColor="#475569"
-                    keyboardType="numeric"
-                    style={styles.formInput}
-                  />
-                </View>
-              </View>
-            </ScrollView>
+            <ProductForm
+              name={name}
+              setName={setName}
+              description={description}
+              setDescription={setDescription}
+              price={price}
+              setPrice={setPrice}
+              commissionPct={commissionPct}
+              setCommissionPct={setCommissionPct}
+              maxInfluencers={maxInfluencers}
+              setMaxInfluencers={setMaxInfluencers}
+              minFollowers={minFollowers}
+              setMinFollowers={setMinFollowers}
+              showImageInput={false}
+            />
 
             <View style={styles.modalButtons}>
               <GradientButton 

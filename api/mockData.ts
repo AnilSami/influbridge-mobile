@@ -371,6 +371,10 @@ export const MockAPI = {
 
   // Products Controller
   getProducts: () => products,
+  getVendorProducts: () => {
+    const currentVendor = vendors.find(v => v.userId === currentUser?.id) || vendors[0];
+    return products.filter(p => p.vendorId === currentVendor.id);
+  },
   createProduct: (name: string, description: string, price: number, commissionPct: number, imageUrls: string, maxInfluencers?: number, minFollowers?: number) => {
     const currentVendor = vendors.find(v => v.userId === currentUser?.id) || vendors[0];
     const newProd: Product = {

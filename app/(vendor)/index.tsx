@@ -20,8 +20,11 @@ import Avatar from '../../components/Avatar';
 import ProgressCircle from '../../components/ProgressCircle';
 
 export default function VendorDashboard() {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const router = useRouter();
+
+  const currentVendor = MockAPI.getVendors().find(v => v.userId === user?.id) || MockAPI.getVendors()[0];
+  const companyName = currentVendor?.companyName || 'GearUp Labs';
 
   const handleLogout = async () => {
     await logout();
@@ -33,7 +36,7 @@ export default function VendorDashboard() {
     let interval: any;
     if (isSimulating) {
       interval = setInterval(() => {
-        const activeCamps = MockAPI.getCampaigns().filter(c => c.status === 'ACTIVE');
+        const activeCamps = MockAPI.getVendorCampaigns().filter(c => c.status === 'ACTIVE');
         if (activeCamps.length > 0) {
           const randomCamp = activeCamps[Math.floor(Math.random() * activeCamps.length)];
           const randomAmt = parseFloat((50 + Math.random() * 200).toFixed(2));
@@ -95,9 +98,9 @@ export default function VendorDashboard() {
         <View style={styles.header}>
           <View>
             <Text style={Typography.h2}>Command Console</Text>
-            <Text style={Typography.caption}>GearUp Labs Account</Text>
+            <Text style={Typography.caption}>{companyName} Account</Text>
           </View>
-          <Avatar name="GearUp Labs" ringColor="#6366f1" />
+          <Avatar name={companyName} ringColor="#6366f1" />
         </View>
 
         {/* Metrics Grid */}
