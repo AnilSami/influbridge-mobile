@@ -16,6 +16,7 @@ import { useAuth } from '../../hooks/useAuth';
 import GlassCard from '../../components/GlassCard';
 import Avatar from '../../components/Avatar';
 import ProgressCircle from '../../components/ProgressCircle';
+import MeshBackground from '../../components/MeshBackground';
 
 export default function InfluencerDashboard() {
   const { logout } = useAuth();
