@@ -6,7 +6,8 @@ import {
   ScrollView, 
   TouchableOpacity, 
   ActivityIndicator, 
-  RefreshControl
+  RefreshControl,
+  Alert
 } from 'react-native';
 import { CircleDollarSign, MousePointerClick, TrendingUp, LogOut, ArrowRight, ShieldCheck } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
@@ -29,6 +30,17 @@ export default function VendorDashboard() {
   const handleLogout = async () => {
     await logout();
     router.replace('/(auth)/splash' as any);
+  };
+
+  const handleProfilePress = () => {
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out of the Vendor Portal?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Sign Out', style: 'destructive', onPress: handleLogout }
+      ]
+    );
   };
   const [isSimulating, setIsSimulating] = useState(false);
 
@@ -100,7 +112,9 @@ export default function VendorDashboard() {
             <Text style={Typography.h2}>Command Console</Text>
             <Text style={Typography.caption}>{companyName} Account</Text>
           </View>
-          <Avatar name={companyName} ringColor="#6366f1" />
+          <TouchableOpacity onPress={handleProfilePress} activeOpacity={0.75}>
+            <Avatar name={companyName} ringColor="#6366f1" />
+          </TouchableOpacity>
         </View>
 
         {/* Metrics Grid */}
@@ -219,12 +233,7 @@ export default function VendorDashboard() {
           </GlassCard>
         )}
 
-        {/* Logout button */}
-        <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-          <LogOut size={14} color="#ef4444" style={styles.logoutIcon} />
-          <Text style={styles.logoutText}>Sign Out of Vendor Portal</Text>
-        </TouchableOpacity>
-      </ScrollView>
+       </ScrollView>
     </MeshBackground>
   );
 }

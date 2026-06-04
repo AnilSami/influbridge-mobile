@@ -6,7 +6,8 @@ import {
   ScrollView, 
   TouchableOpacity, 
   ActivityIndicator, 
-  RefreshControl
+  RefreshControl,
+  Alert
 } from 'react-native';
 import { DollarSign, MousePointerClick, Percent, LogOut, ArrowRight, BarChart3 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
@@ -28,6 +29,17 @@ export default function InfluencerDashboard() {
   const handleLogout = async () => {
     await logout();
     router.replace('/(auth)/splash' as any);
+  };
+
+  const handleProfilePress = () => {
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out of the Creator Dashboard?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Sign Out', style: 'destructive', onPress: handleLogout }
+      ]
+    );
   };
 
   const [data, setData] = useState<any>(null);
@@ -82,7 +94,9 @@ export default function InfluencerDashboard() {
           <Text style={Typography.h2}>Earnings Console</Text>
           <Text style={Typography.caption}>{displayName} Profile</Text>
         </View>
-        <Avatar name={displayName} ringColor="#10b981" />
+        <TouchableOpacity onPress={handleProfilePress} activeOpacity={0.75}>
+          <Avatar name={displayName} ringColor="#10b981" />
+        </TouchableOpacity>
       </View>
 
       {/* Metrics Row */}
@@ -161,11 +175,6 @@ export default function InfluencerDashboard() {
         </GlassCard>
       )}
 
-      {/* Logout button */}
-      <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-        <LogOut size={14} color="#ef4444" style={styles.logoutIcon} />
-        <Text style={styles.logoutText}>Sign Out of Influencer Portal</Text>
-      </TouchableOpacity>
       </ScrollView>
     </MeshBackground>
   );
