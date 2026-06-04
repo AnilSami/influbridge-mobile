@@ -130,6 +130,7 @@ export default function ProductForm({
 const styles = StyleSheet.create({
   formScroll: {
     marginBottom: 16,
+    flexShrink: 1,
   },
   formLabel: {
     fontSize: 9,
