@@ -44,9 +44,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const loginAsRole = (role: 'VENDOR' | 'INFLUENCER' | 'ADMIN') => {
-    let email = 'influencer@influbridge.com';
-    if (role === 'VENDOR') email = 'vendor@influbridge.com';
-    if (role === 'ADMIN') email = 'admin@influbridge.com';
+    let email = 'influencer@brandly.com';
+    if (role === 'VENDOR') email = 'vendor@brandly.com';
+    if (role === 'ADMIN') email = 'admin@brandly.com';
 
     const mockUser = MockAPI.login(email, role);
     setUser(mockUser);

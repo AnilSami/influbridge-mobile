@@ -99,7 +99,7 @@ export interface Order {
 // Memory Database
 let currentUser: User | null = {
   id: 'usr-1',
-  email: 'influencer@influbridge.com',
+  email: 'influencer@brandly.com',
   role: 'INFLUENCER',
   isVerified: true
 };
@@ -111,7 +111,7 @@ let vendors: Vendor[] = [
     companyName: 'GearUp Labs',
     website: 'https://gearup.labs',
     isApproved: true,
-    user: { email: 'vendor@influbridge.com', isVerified: true }
+    user: { email: 'vendor@brandly.com', isVerified: true }
   },
   {
     id: 'vend-2',
@@ -141,7 +141,7 @@ let influencers: Influencer[] = [
     engagementRate: 4.8,
     isApproved: true,
     instagramUrl: 'https://instagram.com/audreyfit',
-    user: { email: 'influencer@influbridge.com', isVerified: true }
+    user: { email: 'influencer@brandly.com', isVerified: true }
   },
   {
     id: 'inf-2',

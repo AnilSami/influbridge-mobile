@@ -7,11 +7,12 @@ import {
   TouchableOpacity, 
   ScrollView, 
   KeyboardAvoidingView, 
-  Platform 
+  Platform,
+  Image
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Mail, Lock, User, Users, Globe, Eye, Sparkles } from 'lucide-react-native';
-import { Colors, Typography, Gradients } from '../../constants/DesignSystem';
+import { Colors, Shadows, Typography, Gradients } from '../../constants/DesignSystem';
 import { useAuth } from '../../hooks/useAuth';
 import MeshBackground from '../../components/MeshBackground';
 import GlassCard from '../../components/GlassCard';
@@ -95,7 +96,11 @@ export default function RegisterScreen() {
       >
         <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
           <View style={styles.brandContainer}>
-            <Text style={styles.logoText}>InfluBridge</Text>
+            <Image 
+              source={require('../../assets/images/brandly_logo.png')} 
+              style={styles.brandLogo} 
+            />
+            <Text style={styles.logoText}>Brandly</Text>
             <Text style={styles.logoSubtitle}>Create Partner Account</Text>
           </View>
 
@@ -260,6 +265,13 @@ const styles = StyleSheet.create({
   brandContainer: {
     alignItems: 'center',
     marginBottom: 30,
+  },
+  brandLogo: {
+    width: 64,
+    height: 64,
+    borderRadius: 18,
+    marginBottom: 10,
+    ...Shadows.glowPrimary,
   },
   logoText: {
     fontSize: 28,
