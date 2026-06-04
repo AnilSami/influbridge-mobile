@@ -6,8 +6,7 @@ import {
   ScrollView, 
   TouchableOpacity, 
   ActivityIndicator, 
-  RefreshControl,
-  Alert
+  RefreshControl
 } from 'react-native';
 import { CircleDollarSign, MousePointerClick, TrendingUp, LogOut, ArrowRight, ShieldCheck } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
@@ -17,7 +16,6 @@ import { MockAPI } from '../../api/mockData';
 import { useAuth } from '../../hooks/useAuth';
 import MeshBackground from '../../components/MeshBackground';
 import GlassCard from '../../components/GlassCard';
-import Avatar from '../../components/Avatar';
 import ProgressCircle from '../../components/ProgressCircle';
 
 export default function VendorDashboard() {
@@ -30,17 +28,6 @@ export default function VendorDashboard() {
   const handleLogout = async () => {
     await logout();
     router.replace('/(auth)/splash' as any);
-  };
-
-  const handleProfilePress = () => {
-    Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out of the Vendor Portal?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Sign Out', style: 'destructive', onPress: handleLogout }
-      ]
-    );
   };
   const [isSimulating, setIsSimulating] = useState(false);
 
@@ -112,9 +99,6 @@ export default function VendorDashboard() {
             <Text style={Typography.h2}>Command Console</Text>
             <Text style={Typography.caption}>{companyName} Account</Text>
           </View>
-          <TouchableOpacity onPress={handleProfilePress} activeOpacity={0.75}>
-            <Avatar name={companyName} ringColor="#6366f1" />
-          </TouchableOpacity>
         </View>
 
         {/* Metrics Grid */}

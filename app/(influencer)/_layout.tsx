@@ -1,9 +1,34 @@
-import { Tabs } from 'expo-router';
+import { Tabs, useRouter } from 'expo-router';
 import { LayoutDashboard, Store, FolderOpen } from 'lucide-react-native';
-import { Platform } from 'react-native';
+import { Platform, TouchableOpacity, Alert } from 'react-native';
 import { Colors } from '../../constants/DesignSystem';
+import { useAuth } from '../../hooks/useAuth';
+import { MockAPI } from '../../api/mockData';
+import Avatar from '../../components/Avatar';
 
 export default function InfluencerLayout() {
+  const { user, logout } = useAuth();
+  const router = useRouter();
+
+  const currentInfluencer = MockAPI.getInfluencers().find(i => i.userId === user?.id) || MockAPI.getInfluencers()[0];
+  const displayName = currentInfluencer?.displayName || 'Audrey Fitness';
+
+  const handleLogout = async () => {
+    await logout();
+    router.replace('/(auth)/splash' as any);
+  };
+
+  const handleProfilePress = () => {
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out of the Creator Dashboard?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Sign Out', style: 'destructive', onPress: handleLogout }
+      ]
+    );
+  };
+
   return (
     <Tabs
       screenOptions={{
@@ -41,6 +66,11 @@ export default function InfluencerLayout() {
           letterSpacing: 1.5,
         },
         headerShadowVisible: false,
+        headerRight: () => (
+          <TouchableOpacity onPress={handleProfilePress} activeOpacity={0.75} style={{ marginRight: 20 }}>
+            <Avatar name={displayName} ringColor="#10b981" size={32} />
+          </TouchableOpacity>
+        ),
       }}
     >
       <Tabs.Screen

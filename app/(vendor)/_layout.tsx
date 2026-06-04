@@ -1,9 +1,34 @@
-import { Tabs } from 'expo-router';
+import { Tabs, useRouter } from 'expo-router';
 import { LayoutDashboard, ShoppingBag, Users } from 'lucide-react-native';
-import { Platform } from 'react-native';
+import { Platform, TouchableOpacity, Alert } from 'react-native';
 import { Colors } from '../../constants/DesignSystem';
+import { useAuth } from '../../hooks/useAuth';
+import { MockAPI } from '../../api/mockData';
+import Avatar from '../../components/Avatar';
 
 export default function VendorLayout() {
+  const { user, logout } = useAuth();
+  const router = useRouter();
+
+  const currentVendor = MockAPI.getVendors().find(v => v.userId === user?.id) || MockAPI.getVendors()[0];
+  const companyName = currentVendor?.companyName || 'GearUp Labs';
+
+  const handleLogout = async () => {
+    await logout();
+    router.replace('/(auth)/splash' as any);
+  };
+
+  const handleProfilePress = () => {
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out of the Vendor Portal?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Sign Out', style: 'destructive', onPress: handleLogout }
+      ]
+    );
+  };
+
   return (
     <Tabs
       screenOptions={{
@@ -41,6 +66,11 @@ export default function VendorLayout() {
           letterSpacing: 1.5,
         },
         headerShadowVisible: false,
+        headerRight: () => (
+          <TouchableOpacity onPress={handleProfilePress} activeOpacity={0.75} style={{ marginRight: 20 }}>
+            <Avatar name={companyName} ringColor="#6366f1" size={32} />
+          </TouchableOpacity>
+        ),
       }}
     >
       <Tabs.Screen

@@ -6,8 +6,7 @@ import {
   ScrollView, 
   TouchableOpacity, 
   ActivityIndicator, 
-  RefreshControl,
-  Alert
+  RefreshControl
 } from 'react-native';
 import { DollarSign, MousePointerClick, Percent, LogOut, ArrowRight, BarChart3 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
@@ -15,7 +14,6 @@ import { Colors, Typography, Gradients } from '../../constants/DesignSystem';
 import { MockAPI } from '../../api/mockData';
 import { useAuth } from '../../hooks/useAuth';
 import GlassCard from '../../components/GlassCard';
-import Avatar from '../../components/Avatar';
 import ProgressCircle from '../../components/ProgressCircle';
 import MeshBackground from '../../components/MeshBackground';
 
@@ -29,17 +27,6 @@ export default function InfluencerDashboard() {
   const handleLogout = async () => {
     await logout();
     router.replace('/(auth)/splash' as any);
-  };
-
-  const handleProfilePress = () => {
-    Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out of the Creator Dashboard?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Sign Out', style: 'destructive', onPress: handleLogout }
-      ]
-    );
   };
 
   const [data, setData] = useState<any>(null);
@@ -94,9 +81,6 @@ export default function InfluencerDashboard() {
           <Text style={Typography.h2}>Earnings Console</Text>
           <Text style={Typography.caption}>{displayName} Profile</Text>
         </View>
-        <TouchableOpacity onPress={handleProfilePress} activeOpacity={0.75}>
-          <Avatar name={displayName} ringColor="#10b981" />
-        </TouchableOpacity>
       </View>
 
       {/* Metrics Row */}
